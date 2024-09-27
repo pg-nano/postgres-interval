@@ -81,6 +81,8 @@ declare namespace PostgresInterval {
  *
  * @param raw A Postgres interval string.
  */
-declare function PostgresInterval(raw: string): PostgresInterval.IPostgresInterval;
+declare function PostgresInterval(
+  raw: string
+): PostgresInterval.IPostgresInterval;
 
 export = PostgresInterval;
