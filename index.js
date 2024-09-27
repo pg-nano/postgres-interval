@@ -1,69 +1,25 @@
 "use strict";
-function PostgresInterval(raw) {
-  if (!(this instanceof PostgresInterval)) {
-    return new PostgresInterval(raw);
+
+export default class PostgresInterval {
+  constructor() {
+    this.years = 0;
+    this.months = 0;
+    this.days = 0;
+    this.hours = 0;
+    this.minutes = 0;
+    this.seconds = 0;
+    this.milliseconds = 0;
   }
-  this.years = 0;
-  this.months = 0;
-  this.days = 0;
-  this.hours = 0;
-  this.minutes = 0;
-  this.seconds = 0;
-  this.milliseconds = 0;
-  parse(this, raw);
+
+  toISOString() {
+    return toISOString.call(this, { short: false });
+  }
+
+  toISOStringShort() {
+    return toISOString.call(this, { short: true });
+  }
 }
-PostgresInterval.prototype.toPostgres = function () {
-  let postgresString = "";
-  if (this.years) {
-    postgresString +=
-      this.years === 1 ? this.years + " year" : this.years + " years";
-  }
-  if (this.months) {
-    if (postgresString.length) {
-      postgresString += " ";
-    }
-    postgresString +=
-      this.months === 1 ? this.months + " month" : this.months + " months";
-  }
-  if (this.days) {
-    if (postgresString.length) {
-      postgresString += " ";
-    }
-    postgresString +=
-      this.days === 1 ? this.days + " day" : this.days + " days";
-  }
-  if (this.hours) {
-    if (postgresString.length) {
-      postgresString += " ";
-    }
-    postgresString +=
-      this.hours === 1 ? this.hours + " hour" : this.hours + " hours";
-  }
-  if (this.minutes) {
-    if (postgresString.length) {
-      postgresString += " ";
-    }
-    postgresString +=
-      this.minutes === 1 ? this.minutes + " minute" : this.minutes + " minutes";
-  }
-  if (this.seconds || this.milliseconds) {
-    if (postgresString.length) {
-      postgresString += " ";
-    }
-    if (this.milliseconds) {
-      const value =
-        Math.trunc((this.seconds + this.milliseconds / 1000) * 1000000) /
-        1000000;
-      postgresString += value === 1 ? value + " second" : value + " seconds";
-    } else {
-      postgresString +=
-        this.seconds === 1
-          ? this.seconds + " second"
-          : this.seconds + " seconds";
-    }
-  }
-  return postgresString === "" ? "0" : postgresString;
-};
+
 const propertiesISOEquivalent = {
   years: "Y",
   months: "M",
@@ -72,14 +28,7 @@ const propertiesISOEquivalent = {
   minutes: "M",
   seconds: "S",
 };
-// according to ISO 8601
-PostgresInterval.prototype.toISOString = PostgresInterval.prototype.toISO =
-  function () {
-    return toISOString.call(this, { short: false });
-  };
-PostgresInterval.prototype.toISOStringShort = function () {
-  return toISOString.call(this, { short: true });
-};
+
 function toISOString({ short }) {
   let datePart = "";
   if (!short || this.years) {
@@ -116,7 +65,9 @@ function toISOString({ short }) {
   }
   return `P${datePart}T${timePart}`;
 }
+
 const position = { value: 0 };
+
 function readNextNum(interval) {
   let val = 0;
   while (position.value < interval.length) {
@@ -130,6 +81,7 @@ function readNextNum(interval) {
   }
   return val;
 }
+
 function parseMillisecond(interval) {
   const previousPosition = position.value;
   const currentValue = readNextNum(interval);
@@ -152,7 +104,8 @@ function parseMillisecond(interval) {
   const remainder = valueStringLength - 3;
   return currentValue / Math.pow(10, remainder);
 }
-function parse(instance, interval) {
+
+function parseInterval(instance, interval) {
   if (!interval) {
     return;
   }
@@ -207,7 +160,8 @@ function parse(instance, interval) {
     }
   }
 }
-PostgresInterval.parse = function (interval) {
+
+export function parse(interval) {
   const instance = {
     years: 0,
     months: 0,
@@ -217,7 +171,10 @@ PostgresInterval.parse = function (interval) {
     seconds: 0,
     milliseconds: 0,
   };
-  parse(instance, interval);
+  if (typeof interval === 'string') {
+    parseInterval(instance, interval);
+  } else {
+    Object.assign(instance, interval);
+  }
   return instance;
-};
-export default PostgresInterval;
+}
