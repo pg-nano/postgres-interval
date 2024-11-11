@@ -1,6 +1,5 @@
 {
   "name": "postgres-interval",
-  "main": "index.js",
   "type": "module",
   "version": "5.0.0",
   "description": "Parse Postgres interval columns",
@@ -17,19 +16,19 @@
   "scripts": {
     "test": "standard && tape test.js"
   },
-  "keywords": [
-    "postgres",
-    "interval",
-    "parser"
-  ],
+  "keywords": ["postgres", "interval", "parser"],
   "dependencies": {},
   "devDependencies": {
     "standard": "^17.0.0",
     "tape": "^5.0.0"
   },
-  "files": [
-    "index.js",
-    "index.d.ts",
-    "readme.md"
-  ]
+  "main": "index.js",
+  "types": "index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "default": "./index.js"
+    }
+  },
+  "files": ["index.js", "index.d.ts", "readme.md"]
 }
